@@ -7,6 +7,7 @@ import HomeClassConsumer from './views/HomeClassConsumer';
 import HomeFunctionConsumer from './views/HomeFunctionConsumer';
 import RCFieldForm from './views/RCFieldForm';
 import AntdFormPage from './views/AntdFormPage';
+import ReduxPage from './views/ReduxPage';
 import { AppContext } from './context/AppContext'
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
         <RCFieldForm/>
         <hr/>
         <AntdFormPage/>
+        <hr/>
+        <ReduxPage/>
       </AppContext.Provider>
     </div>
   );
