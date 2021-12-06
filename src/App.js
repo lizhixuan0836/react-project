@@ -8,6 +8,8 @@ import HomeFunctionConsumer from './views/HomeFunctionConsumer';
 import RCFieldForm from './views/RCFieldForm';
 import AntdFormPage from './views/AntdFormPage';
 import ReduxPage from './views/ReduxPage';
+import ReactReduxPage from './views/ReactReduxPage';
+import ReactReduxHookPage from './views/ReactReduxHookPage';
 import { AppContext } from './context/AppContext'
 
 function App() {
@@ -27,6 +29,11 @@ function App() {
         <AntdFormPage/>
         <hr/>
         <ReduxPage/>
+        <hr/>
+        <ReactReduxPage/>
+        <hr/>
+        <ReactReduxHookPage/>
+        <hr/>
       </AppContext.Provider>
     </div>
   );

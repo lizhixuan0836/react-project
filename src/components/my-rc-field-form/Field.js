@@ -30,7 +30,7 @@ export default class Field extends Component {
     };
   };
   render() {
-    console.log("render"); //sy-log
+    // console.log("render"); //sy-log
     const returnChildNode = React.cloneElement(
       this.props.children,
       this.getControlled()

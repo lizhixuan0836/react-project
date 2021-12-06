@@ -56,7 +56,7 @@ export default function AntdFormPage(props) {
 
   useEffect(() => {
     form.setFieldsValue({username: "defalut"});
-    console.log("form", form); //sy-log
+    // console.log("form", form); //sy-log
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

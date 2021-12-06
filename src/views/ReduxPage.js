@@ -2,13 +2,13 @@ import React from 'react';
 import store from '../store'
 class ReduxPage extends React.Component {
     add = () => {
-        store.dispatch()
+        store.dispatch({ type: "ADD", payload: 1 })
     }
     asyncAdd = () => {
         store.dispatch((dispatch, getState) => {
             setTimeout(() => {
-                console.log("now ", getState()); //sy-log
-                dispatch({ type: "ADD", payload: 1 });
+                // console.log("now ", getState()); //sy-log
+                dispatch({ type: "ADD", payload: 10 });
             }, 1000);
         });
     }
@@ -25,10 +25,12 @@ class ReduxPage extends React.Component {
         return (
             <div>
                 <p>Hello ReduxPage</p>
-                <div>{store.getState()}</div>
-                <button onClick={this.add}>add</button>
-                <button onClick={this.asyncAdd}>asyncAdd</button>
-                <button onClick={this.promiseAdd}>promiseAdd</button>
+                {/* <div>{store.getState()}</div> */}
+                {/* 获取某一个 */}
+                <div>{store.getState().count}</div>
+                <button onClick={this.add}>add 1</button>
+                <button onClick={this.asyncAdd}>asyncAdd 10</button>
+                <button onClick={this.promiseAdd}>promiseAdd 100</button>
             </div>
         );
     }
