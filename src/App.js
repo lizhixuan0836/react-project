@@ -12,6 +12,8 @@ import ReactReduxHookPage from './views/ReactReduxHookPage'
 import { AppContext } from './context/AppContext'
 
 function App() {
+  const a = '1'
+  console.log(a)
   return (
     <div className='App'>
       <AppContext.Provider value='app-context'>
