@@ -1,3 +1,3 @@
 // app的context
-import {createContext} from 'react';
-export const AppContext = createContext('defaultValue');
+import { createContext } from 'react'
+export const AppContext = createContext('defaultValue')

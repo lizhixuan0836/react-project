@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react'
 
 const Input = (props) => {
-  return <input {...props} />;
-};
+  return <input {...props} />
+}
 
 // const CustomizeInput = ({value = "", ...props}) => (
 //   <div style={{padding: 10}}>
@@ -12,17 +12,17 @@ const Input = (props) => {
 
 class CustomizeInput extends React.Component {
   constructor(props) {
-    super(props);
-    this.state = {};
+    super(props)
+    this.state = {}
   }
   render() {
-    const {value = "", ...otherProps} = this.props;
+    const { value = '', ...otherProps } = this.props
     return (
-      <div style={{padding: 10}}>
-        <Input style={{outline: "none"}} value={value} {...otherProps} />
+      <div style={{ padding: 10 }}>
+        <Input style={{ outline: 'none' }} value={value} {...otherProps} />
       </div>
-    );
+    )
   }
 }
 
-export default CustomizeInput;
+export default CustomizeInput

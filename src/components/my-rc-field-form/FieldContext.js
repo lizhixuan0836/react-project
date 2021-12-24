@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react'
 
 // 1、创建一个context对象
-const FieldContext = React.createContext();
+const FieldContext = React.createContext()
 
-export default FieldContext;
+export default FieldContext
 
 // context传递值
 // 三步走
