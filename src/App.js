@@ -1,4 +1,5 @@
 import './App.css'
+import './styles/index.css'
 import React from 'react'
 import HomeClass from './views/HomeClass'
 import HomeFunction from './views/HomeFunction'

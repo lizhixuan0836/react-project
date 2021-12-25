@@ -1,0 +1,15 @@
+body {
+  position: relative;
+  top: 2px;
+  background-color: red;
+
+  a {
+    position: relative;
+    background-color: red;
+    top: 2px;
+
+    &:hover {
+      background-color: red;
+    }
+  }
+}
