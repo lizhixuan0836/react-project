@@ -1,6 +1,6 @@
-import './App.css'
-import './styles/index.css'
-import React from 'react'
+import './styles/App.scss'
+// import './styles/App.css'
+import React, { useEffect } from 'react'
 import HomeClass from './views/HomeClass'
 import HomeFunction from './views/HomeFunction'
 import HomeClassConsumer from './views/HomeClassConsumer'
@@ -13,8 +13,18 @@ import ReactReduxHookPage from './views/ReactReduxHookPage'
 import { AppContext } from './context/AppContext'
 
 function App() {
+  useEffect(() => {
+    const a = new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('你好')
+      }, 2000)
+    })
+    a.then((res) => {
+      console.log(res)
+    })
+  }, [])
   return (
-    <div className='App'>
+    <div className='app'>
       <AppContext.Provider value='app-context'>
         <HomeClass />
         <hr />
