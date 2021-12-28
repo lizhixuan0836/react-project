@@ -1,13 +1,13 @@
-import React from 'react'
-import HomeClass from './HomeClass'
-import HomeFunction from './HomeFunction'
-import HomeClassConsumer from './HomeClassConsumer'
-import HomeFunctionConsumer from './HomeFunctionConsumer'
-import RCFieldForm from './RCFieldForm'
-import AntdFormPage from './AntdFormPage'
-import ReduxPage from './ReduxPage'
-import ReactReduxPage from './ReactReduxPage'
-import ReactReduxHookPage from './ReactReduxHookPage'
+import React, { lazy } from 'react'
+const HomeClass = lazy(() => import('./HomeClass'))
+const HomeFunction = lazy(() => import('./HomeFunction'))
+const HomeClassConsumer = lazy(() => import('./HomeClassConsumer'))
+const HomeFunctionConsumer = lazy(() => import('./HomeFunctionConsumer'))
+const RCFieldForm = lazy(() => import('./RCFieldForm'))
+const AntdFormPage = lazy(() => import('./AntdFormPage'))
+const ReduxPage = lazy(() => import('./ReduxPage'))
+const ReactReduxPage = lazy(() => import('./ReactReduxPage'))
+const ReactReduxHookPage = lazy(() => import('./ReactReduxHookPage'))
 class Study extends React.Component {
   render() {
     return (

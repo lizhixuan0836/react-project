@@ -1,7 +1,7 @@
 /**
  * class类组件的Consumer传值
  * */
-import { AppContext } from '@/context/AppContext'
+import { AppContext } from 'context/AppContext'
 const { Consumer } = AppContext
 
 function HomeClassConsumer() {
