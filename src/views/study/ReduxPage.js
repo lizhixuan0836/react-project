@@ -1,5 +1,5 @@
 import React from 'react'
-import store from '../store'
+import store from '@/store'
 class ReduxPage extends React.Component {
   add = () => {
     store.dispatch({ type: 'ADD', payload: 1 })

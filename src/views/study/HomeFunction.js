@@ -2,7 +2,7 @@
  * 函数组件的useContext传值
  * */
 import React, { useState, useContext } from 'react'
-import { AppContext } from '../context/AppContext'
+import { AppContext } from '@/context/AppContext'
 function HomeFunction() {
   const [title, setTitle] = useState('这是一个title')
   const context = useContext(AppContext)

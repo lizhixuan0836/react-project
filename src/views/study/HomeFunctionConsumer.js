@@ -1,16 +1,15 @@
 /**
- * class类组件的Consumer传值
+ * 函数组件的Consumer传值
  * */
-import { AppContext } from '../context/AppContext'
+import { AppContext } from '@/context/AppContext'
 const { Consumer } = AppContext
-
-function HomeClassConsumer() {
+function HomeFunction() {
   return (
     <Consumer>
       {(context) => {
         return (
           <>
-            <h2>类组件的Consumer传值</h2>
+            <h2>函数组件的Consumer传值</h2>
             <div>app传来的值：{context}</div>
           </>
         )
@@ -19,4 +18,4 @@ function HomeClassConsumer() {
   )
 }
 
-export default HomeClassConsumer
+export default HomeFunction

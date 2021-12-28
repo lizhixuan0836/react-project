@@ -11,8 +11,10 @@
     "antd": "^4.17.2",
     "craco-less": "^1.20.0",
     "react": "^17.0.2",
+    "react-app-polyfill": "^3.0.0",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
+    "react-router-dom": "^6.2.1",
     "react-scripts": "4.0.3",
     "redux": "^4.1.2",
     "redux-logger": "^3.0.6",
@@ -24,6 +26,7 @@
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
+    "eject": "react-scripts eject",
     "prepare": "husky install",
     "fix:style": "stylelint --fix \"src/styles/*.{css,scss}\""
   },
@@ -54,5 +57,5 @@
     "stylelint-order": "^5.0.0",
     "stylelint-scss": "^4.1.0"
   },
-  "homepage":"."
+  "homepage": "./"
 }
