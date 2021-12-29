@@ -1,6 +1,11 @@
+import {
+  useState
+  // useEffect
+} from 'react'
 import { Form, Input, Button } from 'antd'
 import IconFont from 'components/IconFont'
 // import { UserOutlined } from '@ant-design/icons'
+// import { apiCaptcha } from 'request/api'
 const layout = {
   labelCol: {
     span: 8
@@ -15,7 +20,8 @@ const rules = {
   email: [
     { required: true, message: '请输入邮箱', validateTrigger: 'onBlur' },
     { pattern: /^\w+@[a-z0-9]+\.[a-z]{2,4}$/, message: '请输入正确的邮箱格式', validateTrigger: 'onInput' }
-  ]
+  ],
+  image: [{ required: true, message: '请输入姓名' }]
 }
 
 const onFinish = (values) => {
@@ -23,6 +29,20 @@ const onFinish = (values) => {
 }
 
 function Login() {
+  const [imageUrl, setimageUrl] = useState('/api/captcha')
+  // useEffect(() => {
+  //   apiCaptcha().then((res) => {
+  //     console.log('发送接口的的值')
+  //     setimageUrl(res)
+  //   })
+  //   return () => {
+  //     console.log('return的值')
+  //     setimageUrl('')
+  //   }
+  // }, [])
+  const handleImage = () => {
+    setimageUrl(`/api/captcha?_t=${new Date().getTime()}`)
+  }
   return (
     <Form {...layout} name='nest-messages' onFinish={onFinish}>
       <Form.Item
@@ -42,6 +62,15 @@ function Login() {
         validateTrigger={['onBlur', 'onInput']}
       >
         <Input />
+      </Form.Item>
+      <Form.Item
+        name='image'
+        label='image'
+        wrapperCol={{ ...layout.labelCol }}
+        rules={rules.image}
+        validateTrigger='onBlur'
+      >
+        <img src={imageUrl} alt='captcha' onClick={handleImage} className='img'></img>
       </Form.Item>
       <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
         <Button type='primary' htmlType='submit'>
