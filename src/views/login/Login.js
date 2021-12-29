@@ -3,9 +3,13 @@ import {
   // useEffect
 } from 'react'
 import { Form, Input, Button } from 'antd'
+
 import IconFont from 'components/IconFont'
+// 引入styled样式库
+import './Login.scss'
 // import { UserOutlined } from '@ant-design/icons'
 // import { apiCaptcha } from 'request/api'
+
 const layout = {
   labelCol: {
     span: 8
@@ -44,7 +48,7 @@ function Login() {
     setimageUrl(`/api/captcha?_t=${new Date().getTime()}`)
   }
   return (
-    <Form {...layout} name='nest-messages' onFinish={onFinish}>
+    <Form {...layout} onFinish={onFinish}>
       <Form.Item
         name='name'
         label={<IconFont iconName={'icon-yonghu'}>姓名</IconFont>}
@@ -61,7 +65,7 @@ function Login() {
         rules={rules.email}
         validateTrigger={['onBlur', 'onInput']}
       >
-        <Input />
+        <Input placeholder='Email' />
       </Form.Item>
       <Form.Item
         name='image'

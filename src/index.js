@@ -1,4 +1,5 @@
 // import 'react-app-polyfill/ie11'
+// 引入垫片，兼容ie
 import 'react-app-polyfill/stable'
 // import 'babel-polyfill'
 import React from 'react'
