@@ -3,6 +3,7 @@ import React, { Suspense } from 'react' // Suspense, lazy // useEffect
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Study from './views/study/Study'
 import Login from './views/login/Login'
+import Regist from './views/login/Regist'
 import { AppContext } from './context/AppContext'
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Routes>
               <Route exact path='/' element={<Login></Login>} />
               <Route path='/study' element={<Study></Study>} />
+              <Route path='/regist' element={<Regist></Regist>} />
             </Routes>
           </Suspense>
         </Router>
