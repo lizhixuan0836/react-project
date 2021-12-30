@@ -2,4 +2,6 @@
 import service from './index'
 
 // 验证码
-export const apiCaptcha = (info) => service.get('/api/captcha', info)
+export const apiCaptcha = (_) => service.get('/api/captcha')
+// 注册
+export const userRegister = (data) => service.post('/api//user/register', data)

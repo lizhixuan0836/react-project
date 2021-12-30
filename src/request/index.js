@@ -47,7 +47,7 @@ service.interceptors.response.use((response) => {
         //token过期处理方法
         break
       default:
-        message.error(response.data.msg)
+        message.error(response.data.message)
     }
   } else {
     return response

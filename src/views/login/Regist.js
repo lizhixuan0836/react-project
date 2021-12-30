@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
-import { Form, Input, Button, Row, Col } from 'antd'
+import { Form, Input, Button, Row, Col, message } from 'antd'
 
 import IconFont from 'components/IconFont'
 // 引入styled样式库
 import './Login.scss'
 import { validatenull } from 'utils/util'
-// import { UserOutlined } from '@ant-design/icons'
-// import { apiCaptcha } from 'request/api'
-
+import { userRegister } from 'request/api'
+import md5 from 'md5'
 const layout = {
   labelCol: {
     span: 8
@@ -25,12 +24,12 @@ function Regist() {
   const [captchaState, setCaptchaState] = useState()
 
   const rules = {
-    name: [{ required: true, message: '请输入姓名' }],
     email: [
       { required: true, message: '请输入邮箱', validateTrigger: 'onBlur' },
       { pattern: /^\w+@[a-z0-9]+\.[a-z]{2,4}$/, message: '请输入正确的邮箱格式', validateTrigger: 'onInput' }
     ],
-    image: [{ required: true, message: '请输入验证码' }],
+    captcha: [{ required: true, message: '请输入验证码' }],
+    name: [{ required: true, message: '请输入姓名' }],
     password: [
       { required: true, message: '请输入密码' },
       {
@@ -46,11 +45,7 @@ function Regist() {
           const repassword = form.getFieldValue('repassword')
           if (validatenull(password)) {
             return Promise.resolve()
-          }
-          // else if() {
-
-          // }
-          else {
+          } else {
             return repassword === password ? Promise.resolve() : Promise.reject(new Error('请输入相同的密码'))
           }
         }
@@ -65,14 +60,33 @@ function Regist() {
   }
 
   // 表单提交回调
-  const onFinish = () => {
-    console.log(form)
+  const onFinish = async () => {
+    const params = {
+      email: form.getFieldValue('email'),
+      captcha: form.getFieldValue('captcha'),
+      name: form.getFieldValue('name'),
+      password: md5(form.getFieldValue('password'))
+    }
+    console.log(params)
+    const res = await userRegister(params)
+    if (res.code === 0) {
+      message.success('注册成功')
+    } else {
+      message.error(res.message)
+    }
   }
   useEffect(() => {
     // 设置验证码高度
     setCaptchaState(inputRef.current.input.offsetHeight)
+    console.log(form, 'form有哪些方法')
+    form.setFieldsValue({
+      name: '李志轩',
+      email: '1031760551@qq.com',
+      password: 'Xvange@1995',
+      repassword: 'Xvange@1995'
+    })
     return () => {}
-  }, [])
+  }, [form])
 
   const handleImage = () => {
     setimageUrl(`/api/captcha?_t=${new Date().getTime()}`)
@@ -89,10 +103,10 @@ function Regist() {
         <Input placeholder='请输入Email' />
       </Form.Item>
       <Form.Item
-        name='image'
+        name='captcha'
         label='验证码'
         wrapperCol={{ ...layout.labelCol }}
-        rules={rules.image}
+        rules={rules.captcha}
         validateTrigger='onBlur'
       >
         <Row gutter={[16, 0]} justify='space-between'>
