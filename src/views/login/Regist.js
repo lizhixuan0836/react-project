@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Form, Input, Button, Row, Col, message } from 'antd'
 
 import IconFont from 'components/IconFont'
@@ -17,6 +18,7 @@ const layout = {
 }
 
 function Regist() {
+  let navigate = useNavigate()
   // 验证码地址
   const [imageUrl, setimageUrl] = useState('/api/captcha')
   const [form] = Form.useForm()
@@ -71,6 +73,7 @@ function Regist() {
     const res = await userRegister(params)
     if (res.code === 0) {
       message.success('注册成功')
+      navigate('/')
     } else {
       message.error(res.message)
     }
@@ -148,7 +151,7 @@ function Regist() {
       </Form.Item>
       <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
         <Button type='primary' htmlType='submit'>
-          Submit
+          注册
         </Button>
       </Form.Item>
     </Form>
