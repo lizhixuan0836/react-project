@@ -5,6 +5,7 @@ import Study from './views/study/Study'
 import Login from './views/login/Login'
 import Regist from './views/login/Regist'
 import { AppContext } from './context/AppContext'
+import User from 'views/user/User'
 
 function App() {
   // useEffect(() => {
@@ -24,8 +25,10 @@ function App() {
           <Suspense fallback={<div>Loading...</div>}>
             <Routes>
               <Route exact path='/' element={<Login></Login>} />
+              <Route exact path='/login' element={<Login></Login>} />
               <Route path='/study' element={<Study></Study>} />
               <Route path='/regist' element={<Regist></Regist>} />
+              <Route path='/User' element={<User></User>} />
             </Routes>
           </Suspense>
         </Router>

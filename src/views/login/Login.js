@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { Form, Input, Button, Row, Col, message } from 'antd'
+import { useNavigate } from 'react-router-dom'
 
 import IconFont from 'components/IconFont'
 // 引入styled样式库
 import './Login.scss'
 import { userLogin, apiSendcode } from 'request/api'
 import md5 from 'md5'
+import { setStore } from 'utils/util'
 const layout = {
   labelCol: {
     span: 8
@@ -17,6 +19,7 @@ const layout = {
 // 设置定时器
 let timer
 function Login() {
+  const navigate = useNavigate()
   // 验证码地址
   const [imageUrl, setimageUrl] = useState('/api/captcha')
   // 验证码高度
@@ -65,6 +68,11 @@ function Login() {
     const res = await userLogin(params)
     if (res.code === 0) {
       message.success('登录成功')
+      setStore({
+        name: 'userToken',
+        content: res.data.token
+      })
+      navigate('/User')
     } else {
       message.error(res.message)
     }

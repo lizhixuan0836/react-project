@@ -5,5 +5,6 @@ import service from './index'
 export const apiCaptcha = (_) => service.get('/api/captcha')
 export const apiSendcode = (params) => service.get('/api/sendcode', { params })
 // 注册
-export const userRegister = (data) => service.post('/api//user/register', data)
-export const userLogin = (data) => service.post('/api//user/login', data)
+export const userRegister = (data) => service.post('/api/user/register', data)
+export const userLogin = (data) => service.post('/api/user/login', data)
+export const userInfo = (params) => service.get('/api/user/info', { params })
