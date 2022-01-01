@@ -66,3 +66,16 @@ export const removeStore = (params) => {
   window.localStorage.removeItem(name)
   window.sessionStorage.removeItem(name)
 }
+
+// 处理成form参数格式
+export const formateForm = (form) => {
+  let param = ''
+  for (const key in form) {
+    if (Object.hasOwnProperty.call(form, key)) {
+      if (form[key]) {
+        param = `${param + key}=${form[key]}&`
+      }
+    }
+  }
+  return param.slice(0, -1)
+}

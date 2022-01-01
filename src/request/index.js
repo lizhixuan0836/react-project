@@ -8,7 +8,8 @@ import { baseUrl } from 'const/baseUrl'
 import { getStore, removeStore } from 'utils/util'
 //设置axios基础路径
 const service = axios.create({
-  baseURL: baseUrl
+  baseURL: baseUrl,
+  headers: { 'Content-Type': 'multipart/form-data' }
 })
 
 // 请求拦截器
@@ -22,6 +23,11 @@ service.interceptors.request.use(
     config.headers = {
       'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
     }
+    // if (config.isFile) {
+    //   config.headers = {
+    //     'Content-Type': 'multipart/form-data'
+    //   }
+    // }
     if (token) {
       config.headers['Authorization'] = 'Bearer' + token
     }
@@ -38,12 +44,10 @@ service.interceptors.response.use((response) => {
   // const navigate = useNavigate()
   //根据返回不同的状态码做不同的事情
   // 这里一定要和后台开发人员协商好统一的错误状态码
-  console.log(response)
   if (response.status) {
     switch (response.status) {
       case 200:
         if (response.data.code === -666) {
-          console.log('执行之前最后')
           //token过期处理方法
           window.location.href = '/login'
           removeStore({ name: 'userToken' })
@@ -65,5 +69,6 @@ service.interceptors.response.use((response) => {
     return response
   }
 })
+export const Axios = axios
 //最后把封装好的axios导出
 export default service
