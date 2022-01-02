@@ -20,7 +20,7 @@ const layout = {
 function Regist() {
   let navigate = useNavigate()
   // 验证码地址
-  const [imageUrl, setimageUrl] = useState('/api/captcha')
+  const [imageUrl, setimageUrl] = useState('')
   const [form] = Form.useForm()
   const inputRef = useRef(null)
   const [captchaState, setCaptchaState] = useState()
@@ -79,6 +79,7 @@ function Regist() {
     }
   }
   useEffect(() => {
+    handleImage()
     // 设置验证码高度
     setCaptchaState(inputRef.current.input.offsetHeight)
     console.log(form, 'form有哪些方法')

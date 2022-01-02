@@ -21,7 +21,7 @@ let timer
 function Login() {
   const navigate = useNavigate()
   // 验证码地址
-  const [imageUrl, setimageUrl] = useState('/api/captcha')
+  const [imageUrl, setimageUrl] = useState('')
   // 验证码高度
   const [captchaHeight, setCaptchaHeight] = useState()
   // 发送时间
@@ -80,6 +80,9 @@ function Login() {
   const handleImage = () => {
     setimageUrl(`/api/captcha?_t=${new Date().getTime()}`)
   }
+  useEffect(() => {
+    handleImage()
+  }, [])
 
   useEffect(() => {
     // 设置验证码高度
