@@ -5,8 +5,12 @@ import { message, Button, Progress } from 'antd'
 import './User.scss'
 
 function User() {
+  const CHUNK_SIZE = 0.5 * 1024 * 1024 //0.5m
   const [file, setFile] = useState(null)
+  // 文件上传进度
   const [uploadPercent, setUploadPercent] = useState(0)
+  // 计算hash进度
+  const [hashProgress, setHashProgress] = useState(0)
   const dragRef = useRef(null)
   const handleFileChange = (e) => {
     const file = e.target.files[0]
@@ -25,6 +29,11 @@ function User() {
   }
   // 拖拽文件上传
   const uploadDragFile = async () => {
+    const chunks = createFileChunk(file)
+    console.log(chunks, '切片')
+    // 计算md5不要直接在主线程计算否则卡死
+    const hash = await calculateHashWorker(chunks)
+    console.log(hash, '文件hash计算完毕')
     // 因为上传文件是二进制的,所以要放在formdata之上
     const form = new FormData()
     form.append('name', 'file')
@@ -37,6 +46,27 @@ function User() {
     })
     console.log(res, 111)
   }
+  // 使用webwoker计算md5
+  const calculateHashWorker = async (chunks) => {
+    return new Promise((resolve) => {
+      // 开一个全新的进程
+      const worker = new Worker('/hash.js')
+      console.log(worker)
+      // 吧任务给他
+      worker.postMessage({ chunks: chunks })
+      // 没算完一个回传一个信息
+      worker.onmessage = (e) => {
+        console.log(e)
+        const { progress, hash } = e.data
+        console.log(progress, hash)
+        setHashProgress(Number(progress.toFixed(2)))
+        // 如果有hash说明计算完毕了
+        if (hash) {
+          resolve(hash)
+        }
+      }
+    })
+  }
   // blob 二进制流文件处理成二进制
   const bolbToString = async (blob) => {
     return new Promise((resolve) => {
@@ -47,7 +77,7 @@ function User() {
           .split('')
           .map((v) => v.charCodeAt()) // 变成10进制的ASCII码
           .map((v) => v.toString(16)) // 变成16进制
-          .map((v) => v.padStart(2, '0')) // 补全0
+          .map((v) => v.padStart(2, '0').toUpperCase()) // 补全0
           .join(' ')
         resolve(ret)
       }
@@ -83,8 +113,7 @@ function User() {
     const len = file.size
     const start = await bolbToString(file.slice(0, 2))
     const end = await bolbToString(file.slice(-2, len))
-    console.log(file, len, start, end)
-    const isJpgHead = start === 'FF D8' || end === 'FF D9'
+    const isJpgHead = start === 'FF D8' && end === 'FF D9'
     return isJpgHead
   }
   // 是否是图片
@@ -95,11 +124,22 @@ function User() {
     return gif || png || jpg
   }
 
+  // 创建文件切片
+  const createFileChunk = (file, size = CHUNK_SIZE) => {
+    const chuks = []
+    let cur = 0
+    while (cur < file.size) {
+      chuks.push({ index: cur, file: file.slice(cur, cur + size) })
+      cur += size
+    }
+    chuks.push({ index: file.size, file: file.slice(cur, file.size) })
+    return chuks
+  }
+
   // 用户信息
   useEffect(() => {
     const params = {}
     userInfo(params).then((res) => {
-      console.log(res)
       if (res.code === 0) {
         message.success('查询成功')
       }
@@ -122,11 +162,10 @@ function User() {
       const file = e.dataTransfer.files[0]
 
       const image = await isImage(file)
-      console.log(image, 'iamge')
       if (image) {
         setFile(file ? file : null)
       } else {
-        message.warning('上传文件格式不是gif')
+        message.warning('上传文件格式不是gif，jpg，png')
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,8 +181,10 @@ function User() {
         <input type='file' />
       </div>
       <Button onClick={uploadDragFile}>点击上传</Button>
-      进度条：
+      上传进度条：
       <Progress type='circle' percent={uploadPercent} />
+      计算hash进度条：
+      <Progress type='circle' percent={hashProgress} />
     </div>
   )
 }
