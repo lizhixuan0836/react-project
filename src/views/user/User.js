@@ -72,10 +72,27 @@ function User() {
     const isGifHead = ret === '47 49 46 38 39 61' || ret === '47 49 46 38 37 61'
     return isGifHead
   }
+  // 是否是Png
+  const isPng = async (file) => {
+    const ret = await bolbToString(file.slice(0, 8))
+    const isPngHead = ret === '89 50 4E 47 0D 0A 1A 0A'
+    return isPngHead
+  }
+  // 是否是Jpg
+  const isJpg = async (file) => {
+    const len = file.size
+    const start = await bolbToString(file.slice(0, 2))
+    const end = await bolbToString(file.slice(-2, len))
+    console.log(file, len, start, end)
+    const isJpgHead = start === 'FF D8' || end === 'FF D9'
+    return isJpgHead
+  }
   // 是否是图片
   const isImage = async (file) => {
     let gif = await isGif(file)
-    return gif
+    let png = await isPng(file)
+    let jpg = await isJpg(file)
+    return gif || png || jpg
   }
 
   // 用户信息
@@ -108,6 +125,8 @@ function User() {
       console.log(image, 'iamge')
       if (image) {
         setFile(file ? file : null)
+      } else {
+        message.warning('上传文件格式不是gif')
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
