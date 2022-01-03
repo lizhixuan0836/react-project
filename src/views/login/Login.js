@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Form, Input, Button, Row, Col, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 
-import IconFont from 'components/IconFont'
+import IconFont from 'components/IconFont/index'
 // 引入styled样式库
 import './Login.scss'
 import { userLogin, apiSendcode } from 'request/api'

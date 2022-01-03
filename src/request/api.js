@@ -10,3 +10,4 @@ export const userLogin = (data) => service.post('/api/user/login', data)
 export const userInfo = (params) => service.get('/api/user/info', { params })
 
 export const apiUpload = (data, options) => Axios.post('/api/upload', data, options)
+export const apiUploadFileChunk = (data, options) => Axios.post('/api/uploadFileChunk', data, options)

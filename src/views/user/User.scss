@@ -7,3 +7,26 @@
     align-items: center;
     justify-content: center;
 }
+.none-input{
+    visibility: hidden;
+}
+.cube-contain{
+    display: flex;
+    flex-wrap: wrap;
+    .cube{
+        width: 14px;
+        height: 14px;
+        line-height: 12px;
+        border: solid 1px balck;
+        background-color: #eee;
+        &.success{
+            background-color: green;
+        }
+        &.uploading{
+            background-color: blue;
+        }
+        &.error{
+            background-color: red;
+        }
+    }
+}
