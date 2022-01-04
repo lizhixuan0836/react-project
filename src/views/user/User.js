@@ -1,6 +1,6 @@
 // 用户中心
 import React, { useEffect, useState, useRef } from 'react'
-import { userInfo, apiUpload, apiUploadFileChunk, mergeFile } from 'request/api'
+import { userInfo, apiUpload, apiUploadFileChunk, mergeFile, apiCheckFile } from 'request/api'
 import { message, Button, Progress } from 'antd'
 import './User.scss'
 import SparkMD5 from 'spark-md5'
@@ -72,6 +72,20 @@ function User() {
     const chunks = createFileChunk(chunkFile)
     // 效率高用于比较是否相同文件
     const hashSample = await calclateHashSample(chunkFile)
+
+    // 问一下后端是否存在这个文件，实现秒传或者断点续传
+    const res = await apiCheckFile({
+      hash: hashSample,
+      ext: chunkFile.name.split('.').pop()
+    })
+    // if (res.data.code === 0) {
+    const { uploaded, uploadedList } = res.data.data
+    if (uploaded) {
+      message.success('秒传成功')
+      return
+    }
+    // }
+
     // 给后端的文件
     let mapChunks = chunks.map((chunk, index) => {
       const name = hashSample + '_' + index
@@ -80,18 +94,24 @@ function User() {
         name,
         index,
         chunk: chunk.file,
-        process: 0 // 后续发送接口process持续变化
+        // process: 0 // 后续发送接口process持续变化
+        process: uploadedList.indexOf(name) > -1 ? 100 : 0, // 看是否已经上传
+        error: 0 //后续报错
       }
     })
     // // 先把chunkHash设置为抽样hash的值
     // setChunkHash(hashSample)
-    // 上传切片
-    await uploadChunks(mapChunks)
+    // // promise上传切片
+    // await uploadChunks(mapChunks)
+    // 并发量控制上传切片
+    await uploadControlChunks(mapChunks)
   }
   // promise上传切片
   const uploadChunks = async (chunks) => {
     const resultChunks = chunks
     const request = chunks
+      // 过滤到已经上传的
+      .filter((chunk) => chunk.process !== 100)
       .map((chunk) => {
         // 转成promise
         const form = new FormData()
@@ -112,11 +132,93 @@ function User() {
         })
       })
     // 切片（缺点：请求过多浏览器卡顿）
+    // 尝试申请tcp链接过多也会造成卡顿
     await Promise.all(request)
     // 上传完切片合并文件
     await mergeRequest(chunks)
   }
 
+  // !!!并发量控制上传切片
+  const uploadControlChunks = async (chunks) => {
+    // 原始的chunks
+    const orginChunks = chunks
+    const request = chunks
+      // 过滤到已经上传的
+      .filter((chunk) => chunk.process !== 100)
+      .map((chunk) => {
+        // 转成promise
+        const form = new FormData()
+        form.append('chunk', chunk.chunk)
+        form.append('hash', chunk.hash)
+        form.append('name', chunk.name)
+        form.append('index', chunk.index)
+        return { form, index: chunk.index }
+      })
+    await sendRequest(orginChunks, request)
+    // // 上传完切片合并文件
+    // await mergeRequest(chunks)
+  }
+  // @todo TCP慢启动，先上传一个初始区块，比如100kb，根据上传成功时间，决定下一个区块是
+  // 20k，还是50k
+  // ！！！发送tcp请求固定最大数的请求进行并发量控制
+  // 报错之后，进度条变红，开始重试
+  // 一个切片重试失败3次，整体全部停止
+  const sendRequest = async (orginChunks, chunks, limit = 3) => {
+    const resultChunks = orginChunks
+    // limt 并发数
+    return new Promise((resolve) => {
+      const len = chunks.length
+      let count = 0
+      // 全局停止开关
+      let isStop = false
+      const start = async () => {
+        if (isStop) {
+          return
+        }
+
+        const task = chunks.shift()
+        if (task) {
+          const { form, index } = task
+
+          try {
+            await apiUploadFileChunk(form, {
+              onUploadProgress: (process) => {
+                // 不是整体的进度条了，而是每个区块有自己的进度条，整体的进度条需要计算
+                resultChunks[index].process = Number(((process.loaded / process.total) * 100).toFixed(2))
+                // 更新区块（主要是进度条）!!!对象数组是引用方式 , 对于 react 来说它的值都是地址 (涉及到 tree diff)，因为没有被重新赋值 (地址没有改变)，所以 react 会认为仍然是之前的元素 (element)，则不更新视图。
+                setChunks(() => [...resultChunks])
+              }
+            })
+
+            if (count === len - 1) {
+              // 最后一个任务
+              resolve()
+            } else {
+              count++
+              start()
+            }
+          } catch (error) {
+            resultChunks[index].process = -1
+            if (resultChunks[index].error < 3) {
+              resultChunks[index].error++
+              chunks.unshift(resultChunks[index])
+              setChunks(() => [...resultChunks])
+              // 启动这个错误任务
+              start()
+            } else {
+              console.log(resultChunks, index, '最后这个任务')
+              isStop = true
+            }
+          }
+        }
+      }
+      while (limit > 0) {
+        // 启动limit任务
+        start()
+        limit -= 1
+      }
+    })
+  }
   // ！！！合并请求，进行异步的并发量控制
   const mergeRequest = async (chunks) => {
     // ext为上传的chunks里面的name
