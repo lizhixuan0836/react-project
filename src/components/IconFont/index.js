@@ -7,7 +7,6 @@ const IconFont = createFromIconfontCN({
 })
 
 export default function name({ iconName, isRotate, children }) {
-  console.log(iconName, isRotate, 1111111)
   return (
     <>
       <IconFont type={iconName} className={{ rotate: isRotate }}></IconFont>

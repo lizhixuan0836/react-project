@@ -1,6 +1,6 @@
 // 用户中心
 import React, { useEffect, useState, useRef } from 'react'
-import { userInfo, apiUpload, apiUploadFileChunk } from 'request/api'
+import { userInfo, apiUpload, apiUploadFileChunk, mergeFile } from 'request/api'
 import { message, Button, Progress } from 'antd'
 import './User.scss'
 import SparkMD5 from 'spark-md5'
@@ -13,8 +13,12 @@ function User() {
   const [uploadPercent, setUploadPercent] = useState(0)
   // 计算hash进度
   const [hashProgress, setHashProgress] = useState(0)
+  // 切片的文件
+  const [chunkFile, setChunkFile] = useState(null)
   // 切片hash进度
   const [chunkHashProgress, setChunkHashProgress] = useState(0)
+  // // 切片hash的值
+  // const [chunkHash, setChunkHash] = useState('')
   // 切片chunks进度
   const [chunks, setChunks] = useState([])
 
@@ -63,11 +67,11 @@ function User() {
     const hashIdle = await calculateHashIdle(chunks)
     console.log(hash, hashIdle, 'hash文件')
   }
-  // 拖拽文件上传
+  // 拖拽切片文件上传
   const uploadChunkFile = async () => {
-    const chunks = createFileChunk(file)
+    const chunks = createFileChunk(chunkFile)
     // 效率高用于比较是否相同文件
-    const hashSample = await calclateHashSample(file)
+    const hashSample = await calclateHashSample(chunkFile)
     // 给后端的文件
     let mapChunks = chunks.map((chunk, index) => {
       const name = hashSample + '_' + index
@@ -79,22 +83,12 @@ function User() {
         process: 0 // 后续发送接口process持续变化
       }
     })
-    // setChunks(mapChunks)
+    // // 先把chunkHash设置为抽样hash的值
+    // setChunkHash(hashSample)
+    // 上传切片
     await uploadChunks(mapChunks)
-    // console.log(hash, hashIdle, '文件hash计算完毕')
-    // // 因为上传文件是二进制的,所以要放在formdata之上
-    // const form = new FormData()
-    // form.append('name', 'file')
-    // form.append('file', file)
-    // const res = await apiUpload(form, {
-    //   onUploadProgress: (process) => {
-    //     setUploadPercent(Number(((process.loaded / process.total) * 100).toFixed(2)))
-    //     // console.log(process)
-    //   }
-    // })
-    // console.log(res, 111)
   }
-  // 上传切片
+  // promise上传切片
   const uploadChunks = async (chunks) => {
     const resultChunks = chunks
     const request = chunks
@@ -105,20 +99,32 @@ function User() {
         form.append('hash', chunk.hash)
         form.append('name', chunk.name)
         form.append('index', chunk.index)
-        return { form }
+        return { form, index: chunk.index }
       })
-      .map((form, index) => {
+      .map(({ form, index }) => {
         return apiUploadFileChunk(form, {
           onUploadProgress: (process) => {
             // 不是整体的进度条了，而是每个区块有自己的进度条，整体的进度条需要计算
             resultChunks[index].process = Number(((process.loaded / process.total) * 100).toFixed(2))
-            // 更新区块（主要是进度条）
-            setChunks(resultChunks)
+            // 更新区块（主要是进度条）!!!对象数组是引用方式 , 对于 react 来说它的值都是地址 (涉及到 tree diff)，因为没有被重新赋值 (地址没有改变)，所以 react 会认为仍然是之前的元素 (element)，则不更新视图。
+            setChunks(() => [...resultChunks])
           }
         })
       })
     // 切片（缺点：请求过多浏览器卡顿）
     await Promise.all(request)
+    // 上传完切片合并文件
+    await mergeRequest(chunks)
+  }
+
+  // ！！！合并请求，进行异步的并发量控制
+  const mergeRequest = async (chunks) => {
+    // ext为上传的chunks里面的name
+    mergeFile({
+      ext: chunkFile.name.split('.').pop(), // 后缀名
+      size: CHUNK_SIZE,
+      hash: chunks[0].hash.split('_')[0]
+    })
   }
   // 使用webwoker计算md5(缺点：1、很难和npm包产生联系 2、 sparkmd5要进行毫秒级的控制， 如果加载文件大于这个时间就不行了)
   const calculateHashWorker = async (chunks) => {
@@ -285,23 +291,22 @@ function User() {
     // 10个chunk，取4 * 4
     // 向上取平方根
     setCubeWidth(Math.ceil(Math.sqrt(chunks.length)) * 14)
-    console.log(chunks.length, Math.ceil(Math.sqrt(chunks.length)) * 14)
     // 设置总体chunk进度
     let loaded = 0
     let chunksSize = chunks.reduce((acc, cur) => {
       return acc + cur.chunk.size
     }, 0)
+    // 非空数组判断
     if (!chunks.length) {
       loaded = 0
     } else {
-      loaded = chunks.map((item) => item.chunk.size * (item.progress || 0)).reduce((acc, cur) => acc + cur)
+      loaded = chunks.map((item) => item.chunk.size * (item.process || 0)).reduce((acc, cur) => acc + cur)
     }
-    console.log(chunks, chunksSize, loaded, '66666666666')
-    // console.log(loaded, chunksSize, '上传进度')
     if (chunksSize) {
       setChunkHashProgress(Number((loaded / chunksSize).toFixed(2)))
     }
   }, [chunks])
+
   // 用户信息
   useEffect(() => {
     const params = {}
@@ -327,7 +332,6 @@ function User() {
       dragRef.current.style.borderColor = 'black'
       const file = e.dataTransfer.files[0]
       const image = await isImage(file)
-      console.log(image, file, 99999999)
       if (image) {
         setFile(file ? file : null)
       } else {
@@ -347,7 +351,7 @@ function User() {
       e.preventDefault()
       dragChunkRef.current.style.borderColor = 'black'
       const file = e.dataTransfer.files[0]
-      setFile(file ? file : null)
+      setChunkFile(file ? file : null)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -382,17 +386,16 @@ function User() {
           return (
             <div
               className={`cube${chunk.process > 0 && chunk.process < 100 ? ' uploading' : ''}${
-                chunk.process === 100 ? ' sucess' : ''
+                chunk.process === 100 ? ' success' : ''
               }${chunk.process < 0 ? ' error' : ''}`}
-              // className={{
-              //   cube: true,
-              //   uploading: chunk.process > 0 && chunk.process < 100,
-              //   sucess: chunk.process === 100,
-              //   error: chunk.process < 0
-              // }}
               key={chunk.name}
             >
-              <IconFont iconName={'icon-jiazai'} isRotate={true}></IconFont>
+              {/* 正在上传则显示loading */}
+              {chunk.process > 0 && chunk.process < 100 ? (
+                <IconFont iconName={'icon-jiazai'} isRotate={true}></IconFont>
+              ) : (
+                ''
+              )}
             </div>
           )
         })}

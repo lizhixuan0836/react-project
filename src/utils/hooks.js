@@ -3,6 +3,34 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
+export function useWatch(dep, callback, config = { immediate: false }) {
+  const { immediate } = config
+
+  const prev = useRef()
+  const inited = useRef(false)
+  const stop = useRef(false)
+
+  useEffect(() => {
+    const execute = () => callback(prev.current)
+
+    if (!stop.current) {
+      if (!inited.current) {
+        inited.current = true
+        if (immediate) {
+          execute()
+        }
+      } else {
+        execute()
+      }
+      prev.current = dep
+    }
+  }, [dep])
+
+  return () => {
+    stop.current = true
+  }
+}
+
 const useTimeoutFn = (fn, ms) => {
   const ready = useRef(false)
   const timeout = useRef()
