@@ -6,6 +6,7 @@ import Login from './views/login/Login'
 import Regist from './views/login/Regist'
 import { AppContext } from './context/AppContext'
 import User from 'views/user/User'
+import MarkDown from 'views/markDown/MarkDown'
 
 function App() {
   // useEffect(() => {
@@ -29,6 +30,7 @@ function App() {
               <Route path='/study' element={<Study></Study>} />
               <Route path='/regist' element={<Regist></Regist>} />
               <Route path='/User' element={<User></User>} />
+              <Route path='/markDown' element={<MarkDown></MarkDown>} />
             </Routes>
           </Suspense>
         </Router>

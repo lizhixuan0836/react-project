@@ -8,8 +8,11 @@ export const apiSendcode = (params) => service.get('/api/sendcode', { params })
 export const userRegister = (data) => service.post('/api/user/register', data)
 export const userLogin = (data) => service.post('/api/user/login', data)
 export const userInfo = (params) => service.get('/api/user/info', { params })
-
+// 文件
 export const apiUpload = (data, options) => Axios.post('/api/upload', data, options)
 export const apiUploadFileChunk = (data, options) => Axios.post('/api/uploadFileChunk', data, options)
 export const mergeFile = (data, options) => Axios.post('/api/mergeFile', data, options)
 export const apiCheckFile = (data, options) => Axios.post('/api/checkFile', data, options)
+
+// 文章
+export const articleCreate = (data, options) => Axios.post('/article/create', data, options)
