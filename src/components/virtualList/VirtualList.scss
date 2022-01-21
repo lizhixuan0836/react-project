@@ -1,0 +1,20 @@
+.list-container{
+    // height: 100%;
+    height: calc(100% - 60px);
+    // overflow: hidden;
+    overflow: auto;
+    position: relative;
+    .list-phantom{
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        z-index: -1;
+    }
+    .list{
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+    }
+}

@@ -15,4 +15,5 @@ export const mergeFile = (data, options) => Axios.post('/api/mergeFile', data, o
 export const apiCheckFile = (data, options) => Axios.post('/api/checkFile', data, options)
 
 // 文章
-export const articleCreate = (data, options) => Axios.post('/article/create', data, options)
+export const articleCreate = (data, options) => service.post('/api/article/create', data, options)
+export const articleAll = (params) => service.get('/api/article', { params })

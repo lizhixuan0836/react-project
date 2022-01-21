@@ -8,6 +8,9 @@ import './Login.scss'
 import { userLogin, apiSendcode } from 'request/api'
 import md5 from 'md5'
 import { setStore } from 'utils/util'
+
+import store from 'store'
+
 const layout = {
   labelCol: {
     span: 8
@@ -72,6 +75,12 @@ function Login() {
         name: 'userToken',
         content: res.data.token
       })
+      // 保存本地和redux用户数据
+      setStore({
+        name: 'userInfo',
+        content: res.data
+      })
+      store.dispatch({ type: 'SET_USER', payload: res.data })
       navigate('/User')
     } else {
       message.error(res.message)
